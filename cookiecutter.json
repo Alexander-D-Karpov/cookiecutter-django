@@ -4,7 +4,7 @@
   "description": "",
   "author_name": "sanspie",
   "domain_name": "akarpov.ru",
-  "email": "{{ cookiecutter.author_name.lower()|replace(' ', '-') }}@{{ domain_name }}",
+  "email": "{{ cookiecutter.author_name.lower()|replace(' ', '-') }}@{{ cookiecutter.domain_name }}",
   "version": "0.1.0",
   "timezone": "Europe/Moscow",
   "use_pycharm": "y",
