@@ -84,12 +84,6 @@ class Migration(migrations.Migration):
                     ),
                 ),
                 (
-                    "name",
-                    models.CharField(
-                        blank=True, max_length=255, verbose_name="Name of User"
-                    ),
-                ),
-                (
                     "groups",
                     models.ManyToManyField(
                         blank=True,

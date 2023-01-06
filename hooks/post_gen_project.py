@@ -50,21 +50,10 @@ def remove_heroku_files():
     file_names = ["Procfile", "runtime.txt"]
     for file_name in file_names:
         os.remove(file_name)
-    remove_heroku_build_hooks()
-
-
-def remove_heroku_build_hooks():
-    shutil.rmtree("bin")
 
 
 def remove_celery_files():
-    file_names = [
-        os.path.join("config", "celery_app.py"),
-        os.path.join("{{ cookiecutter.project_slug }}", "users", "tasks.py"),
-        os.path.join(
-            "{{ cookiecutter.project_slug }}", "users", "tests", "test_tasks.py"
-        ),
-    ]
+    file_names = [os.path.join("config", "celery_app.py")]
     for file_name in file_names:
         os.remove(file_name)
 

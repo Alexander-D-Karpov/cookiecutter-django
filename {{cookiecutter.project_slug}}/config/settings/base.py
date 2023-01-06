@@ -336,7 +336,7 @@ SPECTACULAR_SETTINGS = {
     "TITLE": "{{ cookiecutter.project_name }} API",
     "DESCRIPTION": "Documentation of API endpoints of {{ cookiecutter.project_name }}",
     "VERSION": "1.0.0",
-    "SERVE_PERMISSIONS": ["rest_framework.permissions.IsAdminUser"],
+    "SERVE_PERMISSIONS": [],
     "SERVERS": [
         {"url": "http://127.0.0.1:8000", "description": "Local Development server"},
         {"url": "{{ cookiecutter.domain_name }}", "description": "Production server"},
