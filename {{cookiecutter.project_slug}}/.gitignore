@@ -331,6 +331,4 @@ tags
 
 .pytest_cache/
 
-{%- if cookiecutter.use_docker == 'y' %}
 .ipython/
-{%- endif %}
