@@ -16,9 +16,6 @@ services:
       {%- if cookiecutter.use_celery == 'y' %}
       - redis
       {%- endif %}
-      {%- if cookiecutter.use_mailhog == 'y' %}
-      - mailhog
-      {%- endif %}
     volumes:
       - .:/app:z
     env_file:
@@ -39,31 +36,6 @@ services:
       - {{ cookiecutter.project_slug }}_local_postgres_data_backups:/backups
     env_file:
       - ./.envs/.local/.postgres
-
-  docs:
-    image: {{ cookiecutter.project_slug }}_local_docs
-    container_name: {{ cookiecutter.project_slug }}_local_docs
-    build:
-      context: .
-      dockerfile: ./compose/local/docs/Dockerfile
-    env_file:
-      - ./.envs/.local/.django
-    volumes:
-      - ./docs:/docs:z
-      - ./config:/app/config:z
-      - ./{{ cookiecutter.project_slug }}:/app/{{ cookiecutter.project_slug }}:z
-    ports:
-      - "9000:9000"
-    command: /start-docs
-  {%- if cookiecutter.use_mailhog == 'y' %}
-
-  mailhog:
-    image: mailhog/mailhog:v1.0.0
-    container_name: {{ cookiecutter.project_slug }}_local_mailhog
-    ports:
-      - "8025:8025"
-
-  {%- endif %}
   {%- if cookiecutter.use_celery == 'y' %}
 
   redis:
@@ -77,9 +49,6 @@ services:
     depends_on:
       - redis
       - postgres
-      {%- if cookiecutter.use_mailhog == 'y' %}
-      - mailhog
-      {%- endif %}
     ports: []
     command: /start-celeryworker
 
@@ -90,9 +59,6 @@ services:
     depends_on:
       - redis
       - postgres
-      {%- if cookiecutter.use_mailhog == 'y' %}
-      - mailhog
-      {%- endif %}
     ports: []
     command: /start-celerybeat
 
@@ -103,26 +69,5 @@ services:
     ports:
       - "5555:5555"
     command: /start-flower
-
-  {%- endif %}
-  {%- if cookiecutter.frontend_pipeline == 'Gulp' %}
-
-  node:
-    build:
-      context: .
-      dockerfile: ./compose/local/node/Dockerfile
-    image: {{ cookiecutter.project_slug }}_local_node
-    container_name: {{ cookiecutter.project_slug }}_local_node
-    depends_on:
-      - django
-    volumes:
-      - .:/app:z
-      # http://jdlm.info/articles/2016/03/06/lessons-building-node-app-docker.html
-      - /app/node_modules
-    command: npm run dev
-    ports:
-      - "3000:3000"
-      # Expose browsersync UI: https://www.browsersync.io/docs/options/#option-ui
-      - "3001:3001"
 
   {%- endif %}

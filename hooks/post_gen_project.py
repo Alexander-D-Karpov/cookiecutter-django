@@ -32,18 +32,6 @@ SUCCESS = "\x1b[1;32m [SUCCESS]: "
 DEBUG_VALUE = "debug"
 
 
-def remove_open_source_files():
-    file_names = ["CONTRIBUTORS.txt", "LICENSE"]
-    for file_name in file_names:
-        os.remove(file_name)
-
-
-def remove_gplv3_files():
-    file_names = ["COPYING"]
-    for file_name in file_names:
-        os.remove(file_name)
-
-
 def remove_pycharm_files():
     idea_dir_path = ".idea"
     if os.path.exists(idea_dir_path):
@@ -52,18 +40,6 @@ def remove_pycharm_files():
     docs_dir_path = os.path.join("docs", "pycharm")
     if os.path.exists(docs_dir_path):
         shutil.rmtree(docs_dir_path)
-
-
-def remove_docker_files():
-    shutil.rmtree("compose")
-
-    file_names = ["local.yml", "production.yml", ".dockerignore"]
-    for file_name in file_names:
-        os.remove(file_name)
-    if "{{ cookiecutter.use_pycharm }}".lower() == "y":
-        file_names = ["docker_compose_up_django.xml", "docker_compose_up_docs.xml"]
-        for file_name in file_names:
-            os.remove(os.path.join(".idea", "runConfigurations", file_name))
 
 
 def remove_utility_files():
@@ -85,23 +61,6 @@ def remove_heroku_files():
 
 def remove_heroku_build_hooks():
     shutil.rmtree("bin")
-
-
-def remove_gulp_files():
-    file_names = ["gulpfile.js"]
-    for file_name in file_names:
-        os.remove(file_name)
-    remove_sass_files()
-
-
-def remove_sass_files():
-    shutil.rmtree(os.path.join("{{cookiecutter.project_slug}}", "static", "sass"))
-
-
-def remove_packagejson_file():
-    file_names = ["package.json"]
-    for file_name in file_names:
-        os.remove(file_name)
 
 
 def remove_celery_files():
@@ -292,7 +251,6 @@ def set_flags_in_settings_files():
 
 def remove_envs_and_associated_files():
     shutil.rmtree(".envs")
-    os.remove("merge_production_dotenvs_in_dotenv.py")
 
 
 def remove_celery_compose_dirs():
@@ -300,32 +258,8 @@ def remove_celery_compose_dirs():
     shutil.rmtree(os.path.join("compose", "production", "django", "celery"))
 
 
-def remove_node_dockerfile():
-    shutil.rmtree(os.path.join("compose", "local", "node"))
-
-
 def remove_aws_dockerfile():
     shutil.rmtree(os.path.join("compose", "production", "aws"))
-
-
-def remove_drf_starter_files():
-    os.remove(os.path.join("config", "api_router.py"))
-    shutil.rmtree(os.path.join("{{cookiecutter.project_slug}}", "users", "api"))
-    os.remove(
-        os.path.join(
-            "{{cookiecutter.project_slug}}", "users", "tests", "test_drf_urls.py"
-        )
-    )
-    os.remove(
-        os.path.join(
-            "{{cookiecutter.project_slug}}", "users", "tests", "test_drf_views.py"
-        )
-    )
-    os.remove(
-        os.path.join(
-            "{{cookiecutter.project_slug}}", "users", "tests", "test_swagger.py"
-        )
-    )
 
 
 def remove_storages_module():
@@ -342,34 +276,16 @@ def main():
     )
     set_flags_in_settings_files()
 
-    if "{{ cookiecutter.open_source_license }}" == "Not open source":
-        remove_open_source_files()
-    if "{{ cookiecutter.open_source_license}}" != "GPLv3":
-        remove_gplv3_files()
-
     if "{{ cookiecutter.use_pycharm }}".lower() == "n":
         remove_pycharm_files()
 
-    if "{{ cookiecutter.use_docker }}".lower() == "y":
-        remove_utility_files()
-    else:
-        remove_docker_files()
-
-    if (
-        "{{ cookiecutter.use_docker }}".lower() == "y"
-        and "{{ cookiecutter.cloud_provider}}" != "AWS"
-    ):
+    if "{{ cookiecutter.cloud_provider}}" != "AWS":
         remove_aws_dockerfile()
 
     if "{{ cookiecutter.use_heroku }}".lower() == "n":
         remove_heroku_files()
-    elif "{{ cookiecutter.frontend_pipeline }}" != "Django Compressor":
-        remove_heroku_build_hooks()
 
-    if (
-        "{{ cookiecutter.use_docker }}".lower() == "n"
-        and "{{ cookiecutter.use_heroku }}".lower() == "n"
-    ):
+    if "{{ cookiecutter.use_heroku }}".lower() == "n":
         if "{{ cookiecutter.keep_local_envs_in_vcs }}".lower() == "y":
             print(
                 INFO + ".env(s) are only utilized when Docker Compose and/or "
@@ -383,12 +299,6 @@ def main():
         if "{{ cookiecutter.keep_local_envs_in_vcs }}".lower() == "y":
             append_to_gitignore_file("!.envs/.local/")
 
-    if "{{ cookiecutter.frontend_pipeline }}" != "Gulp":
-        remove_gulp_files()
-        remove_packagejson_file()
-        if "{{ cookiecutter.use_docker }}".lower() == "y":
-            remove_node_dockerfile()
-
     if "{{ cookiecutter.cloud_provider}}" == "None":
         print(
             WARNING + "You chose not to use a cloud provider, "
@@ -398,8 +308,7 @@ def main():
 
     if "{{ cookiecutter.use_celery }}".lower() == "n":
         remove_celery_files()
-        if "{{ cookiecutter.use_docker }}".lower() == "y":
-            remove_celery_compose_dirs()
+        remove_celery_compose_dirs()
 
     if "{{ cookiecutter.ci_tool }}" != "Travis":
         remove_dottravisyml_file()
@@ -409,9 +318,6 @@ def main():
 
     if "{{ cookiecutter.ci_tool }}" != "Github":
         remove_dotgithub_folder()
-
-    if "{{ cookiecutter.use_drf }}".lower() == "n":
-        remove_drf_starter_files()
 
     if "{{ cookiecutter.use_async }}".lower() == "n":
         remove_async_files()

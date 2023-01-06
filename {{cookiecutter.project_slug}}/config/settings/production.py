@@ -51,8 +51,7 @@ SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
 # https://docs.djangoproject.com/en/dev/topics/security/#ssl-https
 # https://docs.djangoproject.com/en/dev/ref/settings/#secure-hsts-seconds
-# TODO: set this to 60 seconds first and then to 518400 once you prove the former works
-SECURE_HSTS_SECONDS = 60
+SECURE_HSTS_SECONDS = 518400
 # https://docs.djangoproject.com/en/dev/ref/settings/#secure-hsts-include-subdomains
 SECURE_HSTS_INCLUDE_SUBDOMAINS = env.bool(
     "DJANGO_SECURE_HSTS_INCLUDE_SUBDOMAINS", default=True
@@ -136,125 +135,11 @@ DEFAULT_FILE_STORAGE = "{{cookiecutter.project_slug}}.utils.storages.MediaRootAz
 MEDIA_URL = f"https://{AZURE_ACCOUNT_NAME}.blob.core.windows.net/media/"
 {%- endif %}
 
-# EMAIL
-# ------------------------------------------------------------------------------
-# https://docs.djangoproject.com/en/dev/ref/settings/#default-from-email
-DEFAULT_FROM_EMAIL = env(
-    "DJANGO_DEFAULT_FROM_EMAIL",
-    default="{{cookiecutter.project_name}} <noreply@{{cookiecutter.domain_name}}>",
-)
-# https://docs.djangoproject.com/en/dev/ref/settings/#server-email
-SERVER_EMAIL = env("DJANGO_SERVER_EMAIL", default=DEFAULT_FROM_EMAIL)
-# https://docs.djangoproject.com/en/dev/ref/settings/#email-subject-prefix
-EMAIL_SUBJECT_PREFIX = env(
-    "DJANGO_EMAIL_SUBJECT_PREFIX",
-    default="[{{cookiecutter.project_name}}]",
-)
-
 # ADMIN
 # ------------------------------------------------------------------------------
 # Django Admin URL regex.
 ADMIN_URL = env("DJANGO_ADMIN_URL")
 
-# Anymail
-# ------------------------------------------------------------------------------
-# https://anymail.readthedocs.io/en/stable/installation/#installing-anymail
-INSTALLED_APPS += ["anymail"]  # noqa F405
-# https://docs.djangoproject.com/en/dev/ref/settings/#email-backend
-# https://anymail.readthedocs.io/en/stable/installation/#anymail-settings-reference
-{%- if cookiecutter.mail_service == 'Mailgun' %}
-# https://anymail.readthedocs.io/en/stable/esps/mailgun/
-EMAIL_BACKEND = "anymail.backends.mailgun.EmailBackend"
-ANYMAIL = {
-    "MAILGUN_API_KEY": env("MAILGUN_API_KEY"),
-    "MAILGUN_SENDER_DOMAIN": env("MAILGUN_DOMAIN"),
-    "MAILGUN_API_URL": env("MAILGUN_API_URL", default="https://api.mailgun.net/v3"),
-}
-{%- elif cookiecutter.mail_service == 'Amazon SES' %}
-# https://anymail.readthedocs.io/en/stable/esps/amazon_ses/
-EMAIL_BACKEND = "anymail.backends.amazon_ses.EmailBackend"
-ANYMAIL = {}
-{%- elif cookiecutter.mail_service == 'Mailjet' %}
-# https://anymail.readthedocs.io/en/stable/esps/mailjet/
-EMAIL_BACKEND = "anymail.backends.mailjet.EmailBackend"
-ANYMAIL = {
-    "MAILJET_API_KEY": env("MAILJET_API_KEY"),
-    "MAILJET_SECRET_KEY": env("MAILJET_SECRET_KEY"),
-}
-{%- elif cookiecutter.mail_service == 'Mandrill' %}
-# https://anymail.readthedocs.io/en/stable/esps/mandrill/
-EMAIL_BACKEND = "anymail.backends.mandrill.EmailBackend"
-ANYMAIL = {
-    "MANDRILL_API_KEY": env("MANDRILL_API_KEY"),
-    "MANDRILL_API_URL": env(
-        "MANDRILL_API_URL", default="https://mandrillapp.com/api/1.0"
-    ),
-}
-{%- elif cookiecutter.mail_service == 'Postmark' %}
-# https://anymail.readthedocs.io/en/stable/esps/postmark/
-EMAIL_BACKEND = "anymail.backends.postmark.EmailBackend"
-ANYMAIL = {
-    "POSTMARK_SERVER_TOKEN": env("POSTMARK_SERVER_TOKEN"),
-    "POSTMARK_API_URL": env("POSTMARK_API_URL", default="https://api.postmarkapp.com/"),
-}
-{%- elif cookiecutter.mail_service == 'Sendgrid' %}
-# https://anymail.readthedocs.io/en/stable/esps/sendgrid/
-EMAIL_BACKEND = "anymail.backends.sendgrid.EmailBackend"
-ANYMAIL = {
-    "SENDGRID_API_KEY": env("SENDGRID_API_KEY"),
-    "SENDGRID_API_URL": env("SENDGRID_API_URL", default="https://api.sendgrid.com/v3/"),
-}
-{%- elif cookiecutter.mail_service == 'SendinBlue' %}
-# https://anymail.readthedocs.io/en/stable/esps/sendinblue/
-EMAIL_BACKEND = "anymail.backends.sendinblue.EmailBackend"
-ANYMAIL = {
-    "SENDINBLUE_API_KEY": env("SENDINBLUE_API_KEY"),
-    "SENDINBLUE_API_URL": env(
-        "SENDINBLUE_API_URL", default="https://api.sendinblue.com/v3/"
-    ),
-}
-{%- elif cookiecutter.mail_service == 'SparkPost' %}
-# https://anymail.readthedocs.io/en/stable/esps/sparkpost/
-EMAIL_BACKEND = "anymail.backends.sparkpost.EmailBackend"
-ANYMAIL = {
-    "SPARKPOST_API_KEY": env("SPARKPOST_API_KEY"),
-    "SPARKPOST_API_URL": env(
-        "SPARKPOST_API_URL", default="https://api.sparkpost.com/api/v1"
-    ),
-}
-{%- elif cookiecutter.mail_service == 'Other SMTP' %}
-# https://anymail.readthedocs.io/en/stable/esps
-EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-ANYMAIL = {}
-{%- endif %}
-
-{% if cookiecutter.frontend_pipeline == 'Django Compressor' -%}
-# django-compressor
-# ------------------------------------------------------------------------------
-# https://django-compressor.readthedocs.io/en/latest/settings/#django.conf.settings.COMPRESS_ENABLED
-COMPRESS_ENABLED = env.bool("COMPRESS_ENABLED", default=True)
-{%- if cookiecutter.cloud_provider == 'None' %}
-# https://django-compressor.readthedocs.io/en/latest/settings/#django.conf.settings.COMPRESS_STORAGE
-COMPRESS_STORAGE = "compressor.storage.GzipCompressorFileStorage"
-{%- elif cookiecutter.cloud_provider in ('AWS', 'GCP', 'Azure') and cookiecutter.use_whitenoise == 'n' %}
-# https://django-compressor.readthedocs.io/en/latest/settings/#django.conf.settings.COMPRESS_STORAGE
-COMPRESS_STORAGE = STATICFILES_STORAGE
-{%- endif %}
-# https://django-compressor.readthedocs.io/en/latest/settings/#django.conf.settings.COMPRESS_URL
-COMPRESS_URL = STATIC_URL{% if cookiecutter.use_whitenoise == 'y' or cookiecutter.cloud_provider == 'None' %}  # noqa F405{% endif %}
-{%- if cookiecutter.use_whitenoise == 'y' %}
-# https://django-compressor.readthedocs.io/en/latest/settings/#django.conf.settings.COMPRESS_OFFLINE
-COMPRESS_OFFLINE = True  # Offline compression is required when using Whitenoise
-{%- endif %}
-# https://django-compressor.readthedocs.io/en/latest/settings/#django.conf.settings.COMPRESS_FILTERS
-COMPRESS_FILTERS = {
-    "css": [
-        "compressor.filters.css_default.CssAbsoluteFilter",
-        "compressor.filters.cssmin.rCSSMinFilter",
-    ],
-    "js": ["compressor.filters.jsmin.JSMinFilter"],
-}
-{% endif %}
 {%- if cookiecutter.use_whitenoise == 'n' -%}
 # Collectfast
 # ------------------------------------------------------------------------------
@@ -368,7 +253,6 @@ sentry_sdk.init(
     traces_sample_rate=env.float("SENTRY_TRACES_SAMPLE_RATE", default=0.0),
 )
 {% endif %}
-{% if cookiecutter.use_drf == "y" -%}
 
 # django-rest-framework
 # -------------------------------------------------------------------------------
@@ -376,7 +260,3 @@ sentry_sdk.init(
 SPECTACULAR_SETTINGS["SERVERS"] = [  # noqa F405
     {"url": "https://{{ cookiecutter.domain_name }}", "description": "Production server"}
 ]
-
-{%- endif %}
-# Your stuff...
-# ------------------------------------------------------------------------------
