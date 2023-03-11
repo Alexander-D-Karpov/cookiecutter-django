@@ -40,8 +40,8 @@ def update_site_forward(apps, schema_editor):
     _update_or_create_site_with_sequence(
         Site,
         schema_editor.connection,
-        "akarpov.ru",
-        "Face processor",
+        "{{ cookiecutter.project_slug }}",
+        "{{ cookiecutter.description }}",
     )
 
 
