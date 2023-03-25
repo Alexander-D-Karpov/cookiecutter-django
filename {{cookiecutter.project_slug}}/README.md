@@ -75,3 +75,6 @@ The following details how to deploy this application.
 See detailed [cookiecutter-django Heroku documentation](http://cookiecutter-django.readthedocs.io/en/latest/deployment-on-heroku.html).
 
 {%- endif %}
+
+
+made with [cookiecutter-django](https://github.com/Alexander-D-Karpov/cookiecutter-django)
