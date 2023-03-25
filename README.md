@@ -4,6 +4,7 @@ Template to create new django APIs with drf, docker and poetry
 
 ### TODO
 - add more utils
+- add channels support
 - add python version select
 - fix production docker
 - add ci for production build
