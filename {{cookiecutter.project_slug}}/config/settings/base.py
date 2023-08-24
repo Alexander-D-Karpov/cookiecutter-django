@@ -36,6 +36,19 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/dev/ref/settings/#locale-paths
 LOCALE_PATHS = [str(ROOT_DIR / "locale")]
 
+# CACHES
+# ------------------------------------------------------------------------------
+# https://docs.djangoproject.com/en/dev/ref/settings/#caches
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/1",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        },
+    }
+}
+
 # DATABASES
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/dev/ref/settings/#databases
@@ -76,6 +89,9 @@ THIRD_PARTY_APPS = [
 
 LOCAL_APPS = [
     "{{ cookiecutter.project_slug }}.users",
+{%- if cookiecutter.ticket_app == 'y' %}
+    "{{ cookiecutter.project_slug }}.tickets",
+{%- endif %}
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -335,6 +351,7 @@ SPECTACULAR_SETTINGS = {
     "TITLE": "{{ cookiecutter.project_name }} API",
     "DESCRIPTION": "Documentation of API endpoints of {{ cookiecutter.project_name }}",
     "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
     "SERVE_PERMISSIONS": [],
     "SERVERS": [
         {"url": "http://127.0.0.1:8000", "description": "Local Development server"},
