@@ -25,27 +25,28 @@ ARG APP_HOME=/app
 ENV PYTHONUNBUFFERED 1
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV BUILD_ENV ${BUILD_ENVIRONMENT}
+ENV POETRY_VERSION 1.4.2
 
 WORKDIR ${APP_HOME}
 
 # Install required system dependencies
 RUN apt-get update && apt-get install --no-install-recommends -y \
   # psycopg2 dependencies
-  libpq-dev \
+  libpq-dev build-essential \
   # Translations dependencies
   gettext \
   # cleaning up unused files
   && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
   && rm -rf /var/lib/apt/lists/*
 
-RUN pip install poetry
+RUN pip install "poetry==$POETRY_VERSION"
+RUN python -m venv /venv
 
-# Configuring poetry
-RUN poetry config virtualenvs.create false
-COPY pyproject.toml poetry.lock /
+COPY pyproject.toml poetry.lock /app/
+RUN poetry export -f requirements.txt | /venv/bin/pip install -r /dev/stdin
 
-# Installing requirements
-RUN poetry install
+COPY . .
+RUN poetry build && /venv/bin/pip install dist/*.whl
 
 
 COPY ./compose/production/django/entrypoint /entrypoint
